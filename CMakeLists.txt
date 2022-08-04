@@ -57,5 +57,9 @@ ament_target_dependencies(stereo-inertial rclcpp sensor_msgs cv_bridge ORB_SLAM3
 install(TARGETS mono rgbd stereo stereo-inertial
   DESTINATION lib/${PROJECT_NAME})
 
+# Install launch files.
+install(DIRECTORY launch config vocabulary
+  DESTINATION share/${PROJECT_NAME}/)
+
 ament_package()
 
