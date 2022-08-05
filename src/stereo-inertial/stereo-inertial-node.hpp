@@ -12,6 +12,8 @@
 #include "Map.h"
 #include "Tracking.h"
 
+#include "utility.hpp"
+
 using ImuMsg = sensor_msgs::msg::Imu;
 using ImageMsg = sensor_msgs::msg::Image;
 

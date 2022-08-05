@@ -53,13 +53,13 @@ StereoInertialNode::StereoInertialNode(ORB_SLAM3::System *SLAM, const string &st
             assert(0);
         }
 
-        cv::initUndistortRectifyMap(K_l, D_l, R_l, P_l.rowRange(0, 3).colRange(0, 3), cv::Size(cols_l,rows_l), CV_32F, M1l_, M2l_);
-        cv::initUndistortRectifyMap(K_r, D_r, R_r, P_r.rowRange(0, 3).colRange(0, 3), cv::Size(cols_r,rows_r), CV_32F, M1r_, M2r_);
+        cv::initUndistortRectifyMap(K_l, D_l, R_l, P_l.rowRange(0, 3).colRange(0, 3), cv::Size(cols_l, rows_l), CV_32F, M1l_, M2l_);
+        cv::initUndistortRectifyMap(K_r, D_r, R_r, P_r.rowRange(0, 3).colRange(0, 3), cv::Size(cols_r, rows_r), CV_32F, M1r_, M2r_);
     }
 
     subImu_ = this->create_subscription<ImuMsg>("imu", 1000, std::bind(&StereoInertialNode::GrabImu, this, _1));
-    subImgLeft_ = this->create_subscription<ImageMsg>("camera/left", 100, std::bind(&StereoInertialNode::GrabImageLeft, this, _1));
-    subImgRight_ = this->create_subscription<ImageMsg>("camera/fight", 100, std::bind(&StereoInertialNode::GrabImageRight, this, _1));
+    subImgLeft_ = this->create_subscription<ImageMsg>("camera/left", 10, std::bind(&StereoInertialNode::GrabImageLeft, this, _1));
+    subImgRight_ = this->create_subscription<ImageMsg>("camera/right", 10, std::bind(&StereoInertialNode::GrabImageRight, this, _1));
 
     syncThread_ = new std::thread(&StereoInertialNode::SyncWithImu, this);
 }
@@ -126,7 +126,7 @@ cv::Mat StereoInertialNode::GetImage(const ImageMsg::SharedPtr msg)
     }
     else
     {
-        std::cerr << "Error type" << std::endl;
+        std::cerr << "Error image type" << std::endl;
         return cv_ptr->image.clone();
     }
 }
@@ -141,14 +141,14 @@ void StereoInertialNode::SyncWithImu()
         double tImLeft = 0, tImRight = 0;
         if (!imgLeftBuf_.empty() && !imgRightBuf_.empty() && !imuBuf_.empty())
         {
-            tImLeft = imgLeftBuf_.front()->header.stamp.sec;
-            tImRight = imgRightBuf_.front()->header.stamp.sec;
+            tImLeft = Utility::StampToSec(imgLeftBuf_.front()->header.stamp);
+            tImRight = Utility::StampToSec(imgRightBuf_.front()->header.stamp);
 
             this->bufMutexRight_.lock();
             while ((tImLeft - tImRight) > maxTimeDiff && imgRightBuf_.size() > 1)
             {
                 imgRightBuf_.pop();
-                tImRight = imgRightBuf_.front()->header.stamp.sec;
+                tImRight = Utility::StampToSec(imgRightBuf_.front()->header.stamp);
             }
             this->bufMutexRight_.unlock();
 
@@ -156,7 +156,7 @@ void StereoInertialNode::SyncWithImu()
             while ((tImRight - tImLeft) > maxTimeDiff && imgLeftBuf_.size() > 1)
             {
                 imgLeftBuf_.pop();
-                tImLeft = imgLeftBuf_.front()->header.stamp.sec;
+                tImLeft = Utility::StampToSec(imgLeftBuf_.front()->header.stamp);
             }
             this->bufMutexLeft_.unlock();
 
@@ -165,7 +165,7 @@ void StereoInertialNode::SyncWithImu()
                 // std::cout << "big time difference" << std::endl;
                 continue;
             }
-            if (tImLeft > imuBuf_.back()->header.stamp.sec)
+            if (tImLeft > Utility::StampToSec(imuBuf_.back()->header.stamp))
                 continue;
 
             this->bufMutexLeft_.lock();
@@ -184,9 +184,9 @@ void StereoInertialNode::SyncWithImu()
             {
                 // Load imu measurements from buffer
                 vImuMeas.clear();
-                while (!imuBuf_.empty() && imuBuf_.front()->header.stamp.sec <= tImLeft)
+                while (!imuBuf_.empty() && Utility::StampToSec(imuBuf_.front()->header.stamp) <= tImLeft)
                 {
-                    double t = imuBuf_.front()->header.stamp.sec;
+                    double t = Utility::StampToSec(imuBuf_.front()->header.stamp);
                     cv::Point3f acc(imuBuf_.front()->linear_acceleration.x, imuBuf_.front()->linear_acceleration.y, imuBuf_.front()->linear_acceleration.z);
                     cv::Point3f gyr(imuBuf_.front()->angular_velocity.x, imuBuf_.front()->angular_velocity.y, imuBuf_.front()->angular_velocity.z);
                     vImuMeas.push_back(ORB_SLAM3::IMU::Point(acc, gyr, t));

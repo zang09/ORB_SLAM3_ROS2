@@ -10,7 +10,7 @@
 
 int main(int argc, char **argv)
 {
-    if(argc < 4 || argc > 5)
+    if(argc < 4)
     {
         std::cerr << "\nUsage: ros2 run orbslam stereo path_to_vocabulary path_to_settings do_rectify [do_equalize]" << std::endl;
         rclcpp::shutdown();
