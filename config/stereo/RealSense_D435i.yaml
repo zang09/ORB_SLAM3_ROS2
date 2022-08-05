@@ -3,30 +3,59 @@
 #--------------------------------------------------------------------------------------------
 # Camera Parameters. Adjust them!
 #--------------------------------------------------------------------------------------------
-File.version: "1.0"
+Camera.type: "PinHole"
 
-Camera.type: "Rectified"
+# Left Camera calibration and distortion parameters (OpenCV)
+Camera.fx: 382.613
+Camera.fy: 382.613
+Camera.cx: 320.183
+Camera.cy: 236.455
 
-# Rectified Camera calibration and distortion parameters (OpenCV)
-Camera1.fx: 382.613
-Camera1.fy: 382.613
-Camera1.cx: 320.183
-Camera1.cy: 236.455
+# distortion parameters
+Camera.k1: 0.0
+Camera.k2: 0.0
+Camera.p1: 0.0
+Camera.p2: 0.0
 
-Stereo.b: 0.0499585
+# Right Camera calibration and distortion parameters (OpenCV)
+Camera2.fx: 382.613
+Camera2.fy: 382.613
+Camera2.cx: 320.183
+Camera2.cy: 236.455
+
+# distortion parameters
+Camera2.k1: 0.0
+Camera2.k2: 0.0
+Camera2.p1: 0.0
+Camera2.p2: 0.0
+
+Tlr: !!opencv-matrix
+  rows: 3
+  cols: 4
+  dt: f
+  data: [1.0, 0.0, 0.0, 0.0499585,
+         0.0, 1.0, 0.0, 0.0,
+         0.0, 0.0, 1.0, 0.0,
+         0.0, 0.0, 0.0, 1.0]
+
 
 # Camera resolution
 Camera.width: 640
 Camera.height: 480
 
 # Camera frames per second 
-Camera.fps: 30
+Camera.fps: 30.0
 
 # Color order of the images (0: BGR, 1: RGB. It is ignored if images are grayscale)
 Camera.RGB: 1
 
+# Image scale, it changes the image size to be processed (<1.0: reduce, >1.0: increase)
+Camera.imageScale: 0.5 # 0.5 #0.7071 # 1/sqrt(2)
+
 # Close/Far threshold. Baseline times.
-Stereo.ThDepth: 40.0
+ThDepth: 40.0
+# stereo baseline times fx
+Camera.bf: 19.114771561
 
 #--------------------------------------------------------------------------------------------
 # ORB Parameters
@@ -51,12 +80,12 @@ ORBextractor.minThFAST: 7
 # Viewer Parameters
 #--------------------------------------------------------------------------------------------
 Viewer.KeyFrameSize: 0.05
-Viewer.KeyFrameLineWidth: 1.0
+Viewer.KeyFrameLineWidth: 1
 Viewer.GraphLineWidth: 0.9
-Viewer.PointSize: 2.0
+Viewer.PointSize: 2
 Viewer.CameraSize: 0.08
-Viewer.CameraLineWidth: 3.0
-Viewer.ViewpointX: 0.0
+Viewer.CameraLineWidth: 3
+Viewer.ViewpointX: 0
 Viewer.ViewpointY: -0.7
 Viewer.ViewpointZ: -3.5
-Viewer.ViewpointF: 500.0
+Viewer.ViewpointF: 500

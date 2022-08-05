@@ -3,21 +3,19 @@
 #--------------------------------------------------------------------------------------------
 # Camera Parameters. Adjust them!
 #--------------------------------------------------------------------------------------------
-File.version: "1.0"
-
 Camera.type: "KannalaBrandt8"
 
 # Left Camera calibration and distortion parameters (OpenCV)
-Camera1.fx: 190.97847715128717
-Camera1.fy: 190.9733070521226
-Camera1.cx: 254.93170605935475
-Camera1.cy: 256.8974428996504
+Camera.fx: 190.97847715128717
+Camera.fy: 190.9733070521226
+Camera.cx: 254.93170605935475
+Camera.cy: 256.8974428996504
 
 # Kannala-Brandt distortion parameters
-Camera1.k1: 0.0034823894022493434
-Camera1.k2: 0.0007150348452162257
-Camera1.k3: -0.0020532361418706202
-Camera1.k4: 0.00020293673591811182
+Camera.k1: 0.0034823894022493434
+Camera.k2: 0.0007150348452162257
+Camera.k3: -0.0020532361418706202
+Camera.k4: 0.00020293673591811182
 
 # Right Camera calibration and distortion parameters (OpenCV)
 Camera2.fx: 190.44236969414825
@@ -31,34 +29,44 @@ Camera2.k2: 0.001766278153469831
 Camera2.k3: -0.00266312569781606
 Camera2.k4: 0.0003299517423931039
 
-Stereo.T_c1_c2: !!opencv-matrix
-  rows: 4
+# Transformation matrix from right camera to left camera
+#Tlr: !!opencv-matrix
+#   rows: 3
+#   cols: 4
+#   dt: f
+#   data: [ 1.0000,    0.0008,    0.0007,    0.1011,
+#             -0.0008,    0.9989,    0.0469,    0.0019,
+#             -0.0007,   -0.0469,    0.9989,    0.0010]
+
+Tlr: !!opencv-matrix
+  rows: 3
   cols: 4
   dt: f
   data: [ 0.999999445773493,   0.000791687752817,   0.000694034010224,   0.101063427414194,
             -0.000823363992158,   0.998899461915674,   0.046895490788700,   0.001946204678584,
-            -0.000656143613644,  -0.046896036240590,   0.998899560146304,   0.001015350132563,
-            0.0,0.0,0.0,1.0]
+            -0.000656143613644,  -0.046896036240590,   0.998899560146304,   0.001015350132563]
 
 # Camera resolution
 Camera.width: 512
 Camera.height: 512
 
 # Lapping area between images
-Camera.overlappingBegin: 0
-Camera.overlappingEnd: 511
+Camera.lappingBegin: 0
+Camera.lappingEnd: 511
 
-Camera2.overlappingBegin: 0
-Camera2.overlappingEnd: 511
+Camera2.lappingBegin: 0
+Camera2.lappingEnd: 511
 
 # Camera frames per second
-Camera.fps: 20
+Camera.fps: 20.0
 
 # Color order of the images (0: BGR, 1: RGB. It is ignored if images are grayscale)
 Camera.RGB: 1
 
 # Close/Far threshold. Baseline times.
-Stereo.ThDepth: 40.0
+ThDepth: 40.0
+
+Camera.bf: 19.3079
 
 #--------------------------------------------------------------------------------------------
 # ORB Parameters
@@ -85,12 +93,12 @@ ORBextractor.minThFAST: 7
 # Viewer Parameters
 #--------------------------------------------------------------------------------------------
 Viewer.KeyFrameSize: 0.05
-Viewer.KeyFrameLineWidth: 1.0
-Viewer.GraphLineWidth: 1.0
-Viewer.PointSize: 2.0
+Viewer.KeyFrameLineWidth: 1
+Viewer.GraphLineWidth: 1
+Viewer.PointSize:2
 Viewer.CameraSize: 0.05
-Viewer.CameraLineWidth: 2.0
-Viewer.ViewpointX: 0.0
-Viewer.ViewpointY: -10.0
+Viewer.CameraLineWidth: 2
+Viewer.ViewpointX: 0
+Viewer.ViewpointY: -10
 Viewer.ViewpointZ: -0.1
-Viewer.ViewpointF: 2000.0
+Viewer.ViewpointF: 2000
