@@ -73,7 +73,14 @@ $ ros2 run orbslam3 stereo-inertial PATH_TO_VOCABULARY PATH_TO_YAML_CONFIG_FILE 
 To play ros1 bag file, you should install `ros1 noetic` & `ros1 bridge`.  
 Here is a [link](https://www.theconstructsim.com/ros2-qa-217-how-to-mix-ros1-and-ros2-packages/) to demonstrate example of `ros1-ros2 bridge` procedure.  
 If you have `ros1 noetic` and `ros1 bridge` already, open your terminal and follow this:  
-(Shell A, B, C, D is all different terminal)
+(Shell A, B, C, D is all different terminal, e.g. `stereo-inertial` mode)
+1. Download EuRoC Dataset (`V1_02_medium.bag`)
+```
+$ wget -P ~/Downloads http://robotics.ethz.ch/~asl-datasets/ijrr_euroc_mav_dataset/vicon_room1/V1_02_medium/V1_02_medium.bag
+```  
+
+2. Launch Terminal  
+(e.g. `ROS1_INSTALL_PATH`=`/opt/ros/noetic`, `ROS2_INSTALL_PATH`=`/opt/ros/foxy`)
 ```
 #Shell A:
 source ${ROS1_INSTALL_PATH}/setup.bash
@@ -87,12 +94,14 @@ ros2 run ros1_bridge dynamic_bridge
 
 #Shell C:
 source ${ROS1_INSTALL_PATH}/setup.bash
-rosbag play BAG_NAME --pause /cam0/image_raw:=/camera
+rosbag play ~/Downloads/V1_02_medium.bag --pause /cam0/image_raw:=/camera/left /cam1/image_raw:=/camera/right /imu0:=/imu
 
 #Shell D:
 source ${ROS2_INSTALL_PATH}/setup.bash
-ros2 run orbslam3 mono PATH_TO_VOCABULARY PATH_TO_YAML_CONFIG_FILE
+ros2 run orbslam3 stereo-inertial PATH_TO_VOCABULARY PATH_TO_YAML_CONFIG_FILE BOOL_RECTIFY [BOOL_EQUALIZE]
 ```
+
+3. Press `spacebar` in `Shell C` to resume bag file.  
 
 ## Acknowledgments
 This repository is modified from [this](https://github.com/curryc/ros2_orbslam3) repository.  
