@@ -144,21 +144,21 @@ void StereoInertialNode::SyncWithImu()
             tImLeft = Utility::StampToSec(imgLeftBuf_.front()->header.stamp);
             tImRight = Utility::StampToSec(imgRightBuf_.front()->header.stamp);
 
-            this->bufMutexRight_.lock();
+            bufMutexRight_.lock();
             while ((tImLeft - tImRight) > maxTimeDiff && imgRightBuf_.size() > 1)
             {
                 imgRightBuf_.pop();
                 tImRight = Utility::StampToSec(imgRightBuf_.front()->header.stamp);
             }
-            this->bufMutexRight_.unlock();
+            bufMutexRight_.unlock();
 
-            this->bufMutexLeft_.lock();
+            bufMutexLeft_.lock();
             while ((tImRight - tImLeft) > maxTimeDiff && imgLeftBuf_.size() > 1)
             {
                 imgLeftBuf_.pop();
                 tImLeft = Utility::StampToSec(imgLeftBuf_.front()->header.stamp);
             }
-            this->bufMutexLeft_.unlock();
+            bufMutexLeft_.unlock();
 
             if ((tImLeft - tImRight) > maxTimeDiff || (tImRight - tImLeft) > maxTimeDiff)
             {
@@ -168,15 +168,15 @@ void StereoInertialNode::SyncWithImu()
             if (tImLeft > Utility::StampToSec(imuBuf_.back()->header.stamp))
                 continue;
 
-            this->bufMutexLeft_.lock();
+            bufMutexLeft_.lock();
             imLeft = GetImage(imgLeftBuf_.front());
             imgLeftBuf_.pop();
-            this->bufMutexLeft_.unlock();
+            bufMutexLeft_.unlock();
 
-            this->bufMutexRight_.lock();
+            bufMutexRight_.lock();
             imRight = GetImage(imgRightBuf_.front());
             imgRightBuf_.pop();
-            this->bufMutexRight_.unlock();
+            bufMutexRight_.unlock();
 
             vector<ORB_SLAM3::IMU::Point> vImuMeas;
             bufMutex_.lock();
