@@ -25,8 +25,13 @@ find_package(Pangolin REQUIRED)
 find_package(ORB_SLAM3 REQUIRED)
 
 include_directories(
+  include
   ${ORB_SLAM3_ROOT_DIR}/include
   ${ORB_SLAM3_ROOT_DIR}/include/CameraModels
+)
+
+link_directories(
+  include
 )
 
 add_executable(mono

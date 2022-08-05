@@ -20,6 +20,8 @@
 #include "Map.h"
 #include "Tracking.h"
 
+#include "utility.hpp"
+
 class RgbdSlamNode : public rclcpp::Node
 {
 public:

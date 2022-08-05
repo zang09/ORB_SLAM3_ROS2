@@ -15,6 +15,7 @@
 #include "Map.h"
 #include "Tracking.h"
 
+#include "utility.hpp"
 
 class StereoSlamNode : public rclcpp::Node
 {
@@ -23,7 +24,7 @@ public:
 
     ~StereoSlamNode();
 
-private: 
+private:
     using ImageMsg = sensor_msgs::msg::Image;
     typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::msg::Image, sensor_msgs::msg::Image> approximate_sync_policy;
 
