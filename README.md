@@ -36,12 +36,15 @@ $ colcon build --symlink-install --packages-select orbslam3
 ```
 
 ## Troubleshootings
-If you cannot find `sophus/se3.hpp`:  
+1. If you cannot find `sophus/se3.hpp`:  
 Go to your `ORB_SLAM3_ROOT_DIR` and install sophus library.
 ```
 $ cd ~/{ORB_SLAM3_ROOT_DIR}/Thirdparty/Sophus/build
 $ sudo make install
 ```
+
+2. Please compile with `OpenCV 4.2.0` version.
+Refer this [#issue](https://github.com/zang09/ORB_SLAM3_ROS2/issues/2#issuecomment-1251850857)
 
 ## How to use
 1. Source the workspace  
