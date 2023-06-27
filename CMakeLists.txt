@@ -1,8 +1,9 @@
 cmake_minimum_required(VERSION 3.5)
 project(orbslam3)
 
+set(OpenCV_LIBS /usr/local/lib)
 # You should set the PYTHONPATH to your own python site-packages path
-set(ENV{PYTHONPATH} "/opt/ros/foxy/lib/python3.8/site-packages/")
+set(ENV{PYTHONPATH} "/opt/ros/humble/lib/python3.10/site-packages")
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/CMakeModules)
 
@@ -28,6 +29,7 @@ include_directories(
   include
   ${ORB_SLAM3_ROOT_DIR}/include
   ${ORB_SLAM3_ROOT_DIR}/include/CameraModels
+  ${ORB_SLAM3_ROOT_DIR}/Thirdparty/Sophus
 )
 
 link_directories(
@@ -51,7 +53,7 @@ add_executable(stereo
   src/stereo/stereo-slam-node.cpp
 )
 ament_target_dependencies(stereo rclcpp sensor_msgs cv_bridge message_filters
-ORB_SLAM3 Pangolin)
+	ORB_SLAM3 Pangolin )
 
 add_executable(stereo-inertial
   src/stereo-inertial/stereo-inertial.cpp
@@ -59,8 +61,13 @@ add_executable(stereo-inertial
 )
 ament_target_dependencies(stereo-inertial rclcpp sensor_msgs cv_bridge ORB_SLAM3 Pangolin)
 
-install(TARGETS mono rgbd stereo stereo-inertial
-  DESTINATION lib/${PROJECT_NAME})
+target_link_libraries(mono ${OpenCV_LIBS})
+target_link_libraries(rgbd ${OpenCV_LIBS})
+target_link_libraries(stereo ${OpenCV_LIBS})
+target_link_libraries(stereo-inertial ${OpenCV_LIBS})
+
+
+install(TARGETS mono rgbd stereo stereo-inertial DESTINATION lib/${PROJECT_NAME})
 
 # Install launch files.
 #install(DIRECTORY launch config vocabulary
