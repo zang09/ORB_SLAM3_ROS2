@@ -40,10 +40,16 @@ add_executable(mono
 )
 ament_target_dependencies(mono rclcpp sensor_msgs cv_bridge ORB_SLAM3 Pangolin)
 
+add_executable(mono-inertial
+  src/monocular-inertial/mono-inertial.cpp
+  src/monocular-inertial/monocular-inertial-slam-node.cpp
+)
+ament_target_dependencies(mono-inertial rclcpp sensor_msgs cv_bridge ORB_SLAM3 Pangolin)
+
 add_executable(rgbd
   src/rgbd/rgbd.cpp
-  src/rgbd/rgbd-slam-node.cpp
-)
+  src/rgbd/rgbd-slam-node.cpp)
+
 ament_target_dependencies(rgbd rclcpp sensor_msgs cv_bridge message_filters ORB_SLAM3 Pangolin)
 
 add_executable(stereo
@@ -59,7 +65,7 @@ add_executable(stereo-inertial
 )
 ament_target_dependencies(stereo-inertial rclcpp sensor_msgs cv_bridge ORB_SLAM3 Pangolin)
 
-install(TARGETS mono rgbd stereo stereo-inertial
+install(TARGETS mono mono-inertial rgbd stereo stereo-inertial
   DESTINATION lib/${PROJECT_NAME})
 
 # Install launch files.
