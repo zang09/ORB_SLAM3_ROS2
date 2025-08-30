@@ -1,4 +1,4 @@
-# ORB_SLAM3_ROS2 LA Update
+# ORB_SLAM3_ROS2
 This repository is ROS2 wrapping to use ORB_SLAM3
 
 ---
