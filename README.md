@@ -1,4 +1,4 @@
-# ORB_SLAM3_ROS2
+# ORB_SLAM3_ROS2 LA Update
 This repository is ROS2 wrapping to use ORB_SLAM3
 
 ---
@@ -18,6 +18,18 @@ This repository is ROS2 wrapping to use ORB_SLAM3
 - Install related ROS2 package
 ```
 $ sudo apt install ros-$ROS_DISTRO-vision-opencv && sudo apt install ros-$ROS_DISTRO-message-filters
+```
+
+- Clone and Build ORB3_SLAM, in this case was used the following fork: https://github.com/suchetanrs/ORB_SLAM3.git to this path (as example) /home/REPLACE_WITH_USERNAME/libs/ORB_SLAM3 
+- Set ENV variable ORB_SLAM3_ROOT_DIR with path to ORB3_SLAM lib PATH, by adding the following line to `/home/REPLACE_WITH_USERNAME/.bashrc` file:
+```
+export ORB_SLAM3_ROOT_DIR="/home/REPLACE_WITH_USERNAME/libs/ORB_SLAM3"
+```
+- Source new ENV Variable to the environment:
+```
+$ source /home/REPLACE_WITH_USERNAME/.bashrc
+or 
+$ source ~/.bashrc
 ```
 
 ## How to build
