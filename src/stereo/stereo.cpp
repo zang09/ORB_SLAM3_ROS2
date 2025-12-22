@@ -21,8 +21,9 @@ int main(int argc, char **argv)
     // malloc error using new.. try shared ptr
     // Create SLAM system. It initializes all system threads and gets ready to process frames.
 
-    bool visualization = true;
-    ORB_SLAM3::System pSLAM(argv[1], argv[2], ORB_SLAM3::System::STEREO, visualization);
+    bool visualization = false;
+    bool enable_loop_closure = true;
+    ORB_SLAM3::System pSLAM(argv[1], argv[2], ORB_SLAM3::System::STEREO, visualization, enable_loop_closure);
 
     auto node = std::make_shared<StereoSlamNode>(&pSLAM, argv[2], argv[3]);
     std::cout << "============================ " << std::endl;

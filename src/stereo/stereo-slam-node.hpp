@@ -3,6 +3,7 @@
 
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/image.hpp"
+#include "geometry_msgs/msg/pose_stamped.hpp"
 
 #include "message_filters/subscriber.h"
 #include "message_filters/synchronizer.h"
@@ -33,6 +34,7 @@ private:
     ORB_SLAM3::System* m_SLAM;
 
     bool doRectify;
+    bool saveTrajectory;
     cv::Mat M1l,M2l,M1r,M2r;
 
     cv_bridge::CvImageConstPtr cv_ptrLeft;
@@ -42,6 +44,8 @@ private:
     std::shared_ptr<message_filters::Subscriber<sensor_msgs::msg::Image> > right_sub;
 
     std::shared_ptr<message_filters::Synchronizer<approximate_sync_policy> > syncApproximate;
+    
+    rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr pose_pub;
 };
 
 #endif

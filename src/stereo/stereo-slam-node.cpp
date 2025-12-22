@@ -48,11 +48,21 @@ StereoSlamNode::StereoSlamNode(ORB_SLAM3::System* pSLAM, const string &strSettin
         cv::initUndistortRectifyMap(K_r,D_r,R_r,P_r.rowRange(0,3).colRange(0,3),cv::Size(cols_r,rows_r),CV_32F,M1r,M2r);
     }
 
-    left_sub = std::make_shared<message_filters::Subscriber<ImageMsg> >(shared_ptr<rclcpp::Node>(this), "camera/left");
-    right_sub = std::make_shared<message_filters::Subscriber<ImageMsg> >(shared_ptr<rclcpp::Node>(this), "camera/right");
+    // Use sensor data QoS profile with best effort reliability
+    rclcpp::QoS qos_profile = rclcpp::SensorDataQoS();
+    
+    left_sub = std::make_shared<message_filters::Subscriber<ImageMsg> >(this, "/place_detector_cam/zed_node/left/image_rect_color", rmw_qos_profile_sensor_data);
+    right_sub = std::make_shared<message_filters::Subscriber<ImageMsg> >(this, "/place_detector_cam/zed_node/right/image_rect_color", rmw_qos_profile_sensor_data);
 
     syncApproximate = std::make_shared<message_filters::Synchronizer<approximate_sync_policy> >(approximate_sync_policy(10), *left_sub, *right_sub);
     syncApproximate->registerCallback(&StereoSlamNode::GrabStereo, this);
+    
+    // Create publisher for camera pose
+    pose_pub = this->create_publisher<geometry_msgs::msg::PoseStamped>("orb3/pose", 10);
+    
+    // Declare parameter for saving trajectory
+    this->declare_parameter<bool>("save_trajectory", false);
+    this->get_parameter("save_trajectory", saveTrajectory);
 }
 
 StereoSlamNode::~StereoSlamNode()
@@ -60,8 +70,12 @@ StereoSlamNode::~StereoSlamNode()
     // Stop all threads
     m_SLAM->Shutdown();
 
-    // Save camera trajectory
-    m_SLAM->SaveKeyFrameTrajectoryTUM("KeyFrameTrajectory.txt");
+    // Save camera trajectory if enabled
+    if (saveTrajectory)
+    {
+        RCLCPP_INFO(this->get_logger(), "Saving keyframe trajectory to KeyFrameTrajectory.txt");
+        m_SLAM->SaveKeyFrameTrajectoryTUM("KeyFrameTrajectory.txt");
+    }
 }
 
 void StereoSlamNode::GrabStereo(const ImageMsg::SharedPtr msgLeft, const ImageMsg::SharedPtr msgRight)
@@ -88,14 +102,41 @@ void StereoSlamNode::GrabStereo(const ImageMsg::SharedPtr msgLeft, const ImageMs
         return;
     }
 
+    Sophus::SE3f Tcw;
     if (doRectify){
         cv::Mat imLeft, imRight;
         cv::remap(cv_ptrLeft->image,imLeft,M1l,M2l,cv::INTER_LINEAR);
         cv::remap(cv_ptrRight->image,imRight,M1r,M2r,cv::INTER_LINEAR);
-        m_SLAM->TrackStereo(imLeft, imRight, Utility::StampToSec(msgLeft->header.stamp));
+        Tcw = m_SLAM->TrackStereo(imLeft, imRight, Utility::StampToSec(msgLeft->header.stamp));
     }
     else
     {
-        m_SLAM->TrackStereo(cv_ptrLeft->image, cv_ptrRight->image, Utility::StampToSec(msgLeft->header.stamp));
+        Tcw = m_SLAM->TrackStereo(cv_ptrLeft->image, cv_ptrRight->image, Utility::StampToSec(msgLeft->header.stamp));
+    }
+    
+    // Publish pose if tracking was successful
+    if (!Tcw.translation().isZero() || !Tcw.so3().matrix().isIdentity())
+    {
+        // Tcw is camera pose (transform from world to camera)
+        // We need Twc (transform from camera to world) for publishing
+        Sophus::SE3f Twc = Tcw.inverse();
+        
+        geometry_msgs::msg::PoseStamped pose_msg;
+        pose_msg.header.stamp = msgLeft->header.stamp;
+        pose_msg.header.frame_id = "map";
+        
+        // Extract translation
+        pose_msg.pose.position.x = Twc.translation().x();
+        pose_msg.pose.position.y = Twc.translation().y();
+        pose_msg.pose.position.z = Twc.translation().z();
+        
+        // Extract rotation as quaternion
+        Eigen::Quaternionf q(Twc.so3().unit_quaternion());
+        pose_msg.pose.orientation.x = q.x();
+        pose_msg.pose.orientation.y = q.y();
+        pose_msg.pose.orientation.z = q.z();
+        pose_msg.pose.orientation.w = q.w();
+        
+        pose_pub->publish(pose_msg);
     }
 }
